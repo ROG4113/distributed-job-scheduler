@@ -46,6 +46,8 @@ public class Job {
 
     private LocalDateTime  scheduledTime;
 
+    private String jobType;
+
     @Builder.Default
     private Integer retryCount=0;
 

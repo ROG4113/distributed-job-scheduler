@@ -25,6 +25,7 @@ public class JobDataLoader implements CommandLineRunner {
             log.info("Seeding initial pending job...");
             Job testJob=Job.builder()
                 .status(JobStatus.PENDING)
+                .jobType("Email task")
                 .payload("to:as0009916@gmail.com")
                 .scheduledTime(LocalDateTime.now().minusMinutes(1))
                 .maxRetries(3)
