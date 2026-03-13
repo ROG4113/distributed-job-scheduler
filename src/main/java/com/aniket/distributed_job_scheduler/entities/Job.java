@@ -4,7 +4,9 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
+import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.annotations.UuidGenerator;
+import org.hibernate.type.SqlTypes;
 
 import com.aniket.distributed_job_scheduler.model.JobStatus;
 
@@ -33,6 +35,7 @@ public class Job {
     @Id
     @UuidGenerator
     @GeneratedValue(generator = "UUID")
+    @JdbcTypeCode(SqlTypes.VARCHAR)
     @Column(length = 36, columnDefinition = "varchar(36)", updatable = false, nullable = false)
     private UUID id;
 
@@ -47,7 +50,7 @@ public class Job {
     private Integer retryCount=0;
 
     @Builder.Default
-    @Column(name = "max_retries")
+    @Column
     private Integer maxRetries=3;
 
     @Version

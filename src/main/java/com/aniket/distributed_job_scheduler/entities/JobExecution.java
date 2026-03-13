@@ -3,7 +3,9 @@ package com.aniket.distributed_job_scheduler.entities;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
+import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.annotations.UuidGenerator;
+import org.hibernate.type.SqlTypes;
 
 import com.aniket.distributed_job_scheduler.model.JobStatus;
 
@@ -31,6 +33,7 @@ public class JobExecution {
     @Id
     @UuidGenerator
     @GeneratedValue(generator = "UUID")
+    @JdbcTypeCode(SqlTypes.VARCHAR)
     @Column(length = 36, columnDefinition = "varchar(36)", updatable = false, nullable = false)
     private UUID id;
 
