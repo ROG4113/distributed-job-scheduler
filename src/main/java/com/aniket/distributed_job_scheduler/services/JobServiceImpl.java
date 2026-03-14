@@ -64,7 +64,7 @@ public class JobServiceImpl implements JobService {
             // find the Email job type
             // This is Java Streams. Think of a stream as a "conveyor belt" for your data where you can filter out things you don't want.
             JobWorker worker=workers.stream()
-                .filter(w->w.getJobType().equalsIgnoreCase("Email task"))
+                .filter(w->w.getJobType().equalsIgnoreCase(job.getJobType()))
                 .findFirst()
                 .orElseThrow(()->new RuntimeException("No Worker found for this Job Type"));
 
