@@ -3,10 +3,12 @@ package com.aniket.distributed_job_scheduler.services;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
+import java.util.UUID;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.aniket.distributed_job_scheduler.dto.JobRequestDto;
 import com.aniket.distributed_job_scheduler.entities.Job;
 import com.aniket.distributed_job_scheduler.entities.JobExecution;
 import com.aniket.distributed_job_scheduler.model.JobStatus;
@@ -111,5 +113,25 @@ public class JobServiceImpl implements JobService {
 
             jobExecutionRepository.save(execution);
         }
+    }
+
+    @Override
+    @Transactional
+    public UUID createJob(JobRequestDto jobRequestDto) {
+        Job newJob=Job.builder()
+            .payload(jobRequestDto.getPayload())
+            .jobType(jobRequestDto.getJobType())
+            .status(JobStatus.PENDING)
+            .scheduledTime(LocalDateTime.now().plusMinutes(jobRequestDto.getScheduledInMinutes()==null?0:jobRequestDto.getScheduledInMinutes()))
+            .maxRetries(3)
+            .build();
+        
+        return jobRepository.save(newJob).getId();
+    }
+
+    @Override
+    public Job getJobById(UUID id) {
+        return jobRepository.findById(id)
+                    .orElseThrow(()->new RuntimeException("Job not found with id: " + id));
     }
 }

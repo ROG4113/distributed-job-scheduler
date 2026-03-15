@@ -21,19 +21,19 @@ public class JobDataLoader implements CommandLineRunner {
 
     @Override
     public void run(String...args){
-        if(jobRepository.count()==0){
-            log.info("Seeding initial pending job...");
-            Job testJob=Job.builder()
-                .status(JobStatus.PENDING)
-                .jobType("Email task")
-                .payload("to:as0009916@gmail.com")
-                .scheduledTime(LocalDateTime.now().minusMinutes(1))
-                .maxRetries(3)
-                .build();
+        // if(jobRepository.count()==0){
+        //     log.info("Seeding initial pending job...");
+        //     Job testJob=Job.builder()
+        //         .status(JobStatus.PENDING)
+        //         .jobType("Email task")
+        //         .payload("to:as0009916@gmail.com")
+        //         .scheduledTime(LocalDateTime.now().minusMinutes(1))
+        //         .maxRetries(3)
+        //         .build();
     
-            jobRepository.save(testJob);
+        //     jobRepository.save(testJob);
     
-            log.info("Job created with id: " + testJob.getId());
-        }
+        //     log.info("Job created with id: " + testJob.getId());
+        // }
     }
 }
