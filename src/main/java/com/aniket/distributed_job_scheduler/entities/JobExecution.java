@@ -8,6 +8,7 @@ import org.hibernate.annotations.UuidGenerator;
 import org.hibernate.type.SqlTypes;
 
 import com.aniket.distributed_job_scheduler.model.JobStatus;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -39,6 +40,7 @@ public class JobExecution {
 
     @ManyToOne
     @JoinColumn(name = ("job_id"))
+    @JsonBackReference // This is the child and will not be serialized(avoiding jackson back and forth loop bug)
     private Job job;
 
     @Enumerated(EnumType.STRING)

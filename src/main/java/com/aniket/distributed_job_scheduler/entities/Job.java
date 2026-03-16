@@ -9,6 +9,7 @@ import org.hibernate.annotations.UuidGenerator;
 import org.hibernate.type.SqlTypes;
 
 import com.aniket.distributed_job_scheduler.model.JobStatus;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -59,5 +60,6 @@ public class Job {
     private Integer version;
 
     @OneToMany(mappedBy = "job", cascade = CascadeType.ALL)
+    @JsonManagedReference // This is the parent and will get serialized(avoiding jackson loop bug)
     private List<JobExecution> executions;
 }

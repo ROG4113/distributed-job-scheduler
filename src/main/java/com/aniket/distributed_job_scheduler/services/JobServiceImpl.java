@@ -134,4 +134,17 @@ public class JobServiceImpl implements JobService {
         return jobRepository.findById(id)
                     .orElseThrow(()->new RuntimeException("Job not found with id: " + id));
     }
+
+    @Override
+    @Transactional
+    public void resetJob(UUID id) {
+        Job job=getJobById(id);
+
+        job.setStatus(JobStatus.PENDING);
+        job.setRetryCount(0);
+
+        jobRepository.save(job);
+
+        log.info("Job {} has m=been manually reset to PENDING", id);
+    }
 }

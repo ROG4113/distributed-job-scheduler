@@ -12,4 +12,6 @@ public interface JobService {
     UUID createJob(JobRequestDto jobRequestDto);
 
     Job getJobById(UUID id);
+
+    void resetJob(UUID id);
 }
