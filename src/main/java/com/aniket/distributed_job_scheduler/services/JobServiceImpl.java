@@ -2,7 +2,9 @@ package com.aniket.distributed_job_scheduler.services;
 
 import java.time.LocalDateTime;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 import org.springframework.stereotype.Service;
@@ -11,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.aniket.distributed_job_scheduler.dto.JobRequestDto;
 import com.aniket.distributed_job_scheduler.entities.Job;
 import com.aniket.distributed_job_scheduler.entities.JobExecution;
+import com.aniket.distributed_job_scheduler.exceptions.ResourceNotFoundException;
 import com.aniket.distributed_job_scheduler.model.JobStatus;
 import com.aniket.distributed_job_scheduler.repositories.JobExecutionRepository;
 import com.aniket.distributed_job_scheduler.repositories.JobRepository;
@@ -20,7 +23,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @Service
-@RequiredArgsConstructor
+// @RequiredArgsConstructor // Using manual constructor so thhat we can initialise the map
 @Slf4j
 public class JobServiceImpl implements JobService {
 
@@ -34,8 +37,22 @@ public class JobServiceImpl implements JobService {
     // The Result: It automatically collects them all and puts them into that List for us.
     // If we create an SmsWorker tomorrow, 
     // Spring will automatically add it to this list without us changing a single line of code in the Service.
-    private final List<JobWorker> workers;
+    // private final List<JobWorker> workers; //adding Map for O(1) lookup as it will be faster if we have too many workers
+    private final Map<String, JobWorker> workerMap=new HashMap<>();
 
+    // Manual constructor to initialise map from workers list
+    public JobServiceImpl(JobRepository jobRepository, JobExecutionRepository jobExecutionRepository, List<JobWorker> workers){
+        this.jobRepository=jobRepository;
+        this.jobExecutionRepository=jobExecutionRepository;
+
+        // building map from workers list
+        workers.forEach((job)->{
+            workerMap.put(job.getJobType().toLowerCase(), job);
+        });
+
+        log.info("Initialised JobService with {} workers", workerMap.size());
+    }
+    
     // To avoid race condition(as we are using pessimistic locking),
     // we need to change the jobStatus and exceute the job in one go(method).
     @Override
@@ -65,10 +82,18 @@ public class JobServiceImpl implements JobService {
 
             // find the Email job type
             // This is Java Streams. Think of a stream as a "conveyor belt" for your data where you can filter out things you don't want.
-            JobWorker worker=workers.stream()
-                .filter(w->w.getJobType().equalsIgnoreCase(job.getJobType()))
-                .findFirst()
-                .orElseThrow(()->new RuntimeException("No Worker found for this Job Type"));
+            // JobWorker worker=workers.stream()
+            //     .filter(w->w.getJobType().equalsIgnoreCase(job.getJobType()))
+            //     .findFirst()
+            //     .orElseThrow(()->new RuntimeException("No Worker found for this Job Type"));
+
+            // NOW: Using map instead of workers list to avoid O(n) lookup
+            JobWorker worker=workerMap.get(job.getJobType().toLowerCase());
+
+            // if map returns null
+            if(worker==null){
+                throw new RuntimeException("No Worker found for this Job Type");
+            }
 
             log.info("Handing Job {} Over to {}", job.getId(), job.getClass().getSimpleName());
 
@@ -132,7 +157,7 @@ public class JobServiceImpl implements JobService {
     @Override
     public Job getJobById(UUID id) {
         return jobRepository.findById(id)
-                    .orElseThrow(()->new RuntimeException("Job not found with id: " + id));
+                    .orElseThrow(()->new ResourceNotFoundException("Job not found with id: " + id));
     }
 
     @Override
