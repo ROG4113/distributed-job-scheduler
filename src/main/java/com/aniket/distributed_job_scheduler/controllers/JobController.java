@@ -14,6 +14,7 @@ import com.aniket.distributed_job_scheduler.dto.JobRequestDto;
 import com.aniket.distributed_job_scheduler.entities.Job;
 import com.aniket.distributed_job_scheduler.services.JobService;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -23,7 +24,7 @@ public class JobController {
     private final JobService jobService;
 
     @PostMapping
-    public ResponseEntity<UUID> submitJob(@RequestBody JobRequestDto jobRequestDto){
+    public ResponseEntity<UUID> submitJob(@RequestBody @Valid JobRequestDto jobRequestDto){
         UUID jobId=jobService.createJob(jobRequestDto);
         return ResponseEntity.ok(jobId);
     }
