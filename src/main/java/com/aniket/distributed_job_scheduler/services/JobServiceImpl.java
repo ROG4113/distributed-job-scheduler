@@ -123,8 +123,10 @@ public class JobServiceImpl implements JobService {
                 job.setStatus(JobStatus.FAILED);
             }
             else{
-                // retry later
+                // retry later after one minute
                 job.setStatus(JobStatus.PENDING);
+                job.setScheduledTime(LocalDateTime.now().plusMinutes(1));
+                log.info("Job {} rescheduled for 1 minute from now", job.getId());
             }
 
             // log the error in audit trail
@@ -170,6 +172,6 @@ public class JobServiceImpl implements JobService {
 
         jobRepository.save(job);
 
-        log.info("Job {} has m=been manually reset to PENDING", id);
+        log.info("Job {} has been manually reset to PENDING", id);
     }
 }
