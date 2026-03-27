@@ -6,6 +6,8 @@ services:
     environment:
       MYSQL_DATABASE: job_scheduler_db
       MYSQL_ROOT_PASSWORD: password
+    volumes:
+      - mysql_data:/var/lib/mysql
     ports:
       - "3306:3306"
     healthcheck:
@@ -26,3 +28,6 @@ services:
     depends_on:
       db:
         condition: service_healthy
+
+volumes:
+  mysql_data:
